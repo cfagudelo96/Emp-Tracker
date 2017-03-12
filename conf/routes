@@ -1,0 +1,37 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                                   controllers.Application.index
+
+GET     /api/empleados                          controllers.EmpleadoController.darEmpleados
+GET     /api/empleados/activos                  controllers.EmpleadoController.darEmpleadosActivos
+GET     /api/empleados/sinCapacitaciones        controllers.EmpleadoController.darEmpleadosSinCapacitaciones
+POST    /api/empleados/sinCapacitacionesFecha   controllers.EmpleadoController.darEmpleadosSinCapacitacionesFecha
+GET     /api/empleados/:id                      controllers.EmpleadoController.darEmpleado(id:Long)
+POST    /api/empleados/buscar                   controllers.EmpleadoController.buscarEmpleados
+POST    /api/empleados                          controllers.EmpleadoController.agregarEmpleado
+PUT     /api/empleados/:id                      controllers.EmpleadoController.editarEmpleado(id:Long)
+DELETE  /api/empleados/:id                      controllers.EmpleadoController.eliminarEmpleado(id:Long)
+
+GET     /api/capacitaciones                     controllers.CapacitacionController.darCapacitaciones
+GET     /api/capacitaciones/:id                 controllers.CapacitacionController.darCapacitacion(id:Long)
+POST    /api/capacitaciones/buscar              controllers.CapacitacionController.buscarCapacitaciones
+POST    /api/capacitaciones/buscarFecha         controllers.CapacitacionController.buscarCapacitacionesFecha
+POST    /api/capacitaciones                     controllers.CapacitacionController.agregarCapacitacion
+POST    /api/capacitaciones/upload              controllers.CapacitacionController.cargarArchivo
+PUT     /api/capacitaciones/:id                 controllers.CapacitacionController.editarCapacitacion(id:Long)
+DELETE  /api/capacitaciones/:id                 controllers.CapacitacionController.eliminarCapacitacion(id:Long)
+
+GET     /api/asistencias                        controllers.AsistenciaController.darAsistencias
+GET     /api/empleados/:id/asistencias          controllers.AsistenciaController.obtenerAsistenciasEmpleado(id:Long)
+GET     /api/capacitaciones/:id/asistencias     controllers.AsistenciaController.obtenerAsistenciasEmpleadoCapacitacion(id:Long)
+POST    /api/empleados/:id/asistencias          controllers.AsistenciaController.obtenerAsistenciasEmpleadoCapacitacion(id:Long)
+POST    /api/empleados/:id/asistencias/fechas   controllers.AsistenciaController.obtenerAsistenciasEmpleadoFechas(id:Long)
+POST    /api/asistencias                        controllers.AsistenciaController.agregarAsistencias
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /public/*file                       controllers.Assets.versioned(path="/public", file: Asset)
+
+    

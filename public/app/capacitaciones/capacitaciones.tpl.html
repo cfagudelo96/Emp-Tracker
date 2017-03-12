@@ -1,0 +1,252 @@
+<div layout="column">
+    <md-card ng-if="!agregar&&!editar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Buscar capacitaciones</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <form name="buscarForm" novalidate ng-submit="buscarForm.$valid&&buscarCapacitaciones()">
+                <div layout="row">
+                    <md-input-container flex="70" ng-if="busqueda.atributo!==opciones[1]">
+                        <label>Buscar</label>
+                        <input type="text" name="valor" required ng-model="busqueda.valor">
+                        <div ng-messages="buscarForm.valor.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe escribirse algo a buscar</div>
+                        </div>
+                    </md-input-container>
+                    <div flex="70" layout="row" ng-if="busqueda.atributo===opciones[1]">
+                        <md-input-container>
+                            <md-datepicker name="fechaInicio" required ng-model="busquedaFecha.fechaInicio" md-placeholder="Fecha inicial"></md-datepicker>
+                            <div ng-messages="buscarForm.fechaInicio.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe elegirse una fecha de inicio</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container>
+                            <md-datepicker name="fechaFinal" required ng-model="busquedaFecha.fechaFinal" md-min-date="busquedaFecha.fechaInicio" md-placeholder="Fecha final"></md-datepicker>
+                            <div ng-messages="buscarForm.fechaFinal.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe elegirse una fecha de finalizacion</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <md-input-container flex="30">
+                        <label>por</label>
+                        <md-select ng-model="busqueda.atributo" name="atributo" required>
+                            <md-option ng-repeat="opcion in opciones" value="{{opcion}}">
+                                {{opcion}}
+                            </md-option>
+                        </md-select>
+                        <div ng-messages="buscarForm.atributo.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe seleccionarse el campo a partir del cual buscar</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="buscarForm.$invalid">Buscar</md-button>
+                    <md-button class="md-raised md-primary" ng-click="mostrarTodos()">Mostrar todos</md-button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+    <md-card ng-if="!agregar&&!editar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Capacitaciones</span>
+                <span class="md-subhead" ng-if="filtro">{{filtro}}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <h4 ng-if="capacitaciones.length==0">No se han encontrado registros</h4>
+            <md-list>
+                <md-list-item class="md-3-line secondary-button-padding" ng-repeat="capacitacion in capacitaciones">
+                    <div class="md-list-item-text" layout="column">
+                        <h3>{{ capacitacion.descripcion }}</h3>
+                        <h4>{{ millisToFecha(capacitacion.fechaInicio) }} - {{ millisToFecha(capacitacion.fechaFinal) }}</h4>
+                        <p>{{ capacitacion.area }}</p>
+                    </div>
+                    <md-button ng-click="mostrarDetalles($index)" class="md-secondary md-icon-button" aria-label="Detalles">
+                        <md-icon md-svg-src="public/images/detalles.svg"></md-icon>
+                    </md-button>
+                    <md-button ng-click="agregarAsistencias($event, $index)" class="md-secondary md-icon-button" aria-label="Agregar">
+                        <md-icon md-svg-src="public/images/agregar.svg"></md-icon>
+                    </md-button>
+                    <md-button ng-click="irEditar($index)" class="md-secondary md-icon-button" aria-label="Editar">
+                        <md-icon md-svg-src="public/images/editar.svg"></md-icon>
+                    </md-button>
+                    <md-button ng-click="eliminarCapacitacion($event, $index)" class="md-secondary md-icon-button" aria-label="Eliminar">
+                        <md-icon md-svg-src="public/images/eliminar.svg"></md-icon>
+                    </md-button>
+                </md-list-item>
+            </md-list>
+        </md-card-content>
+    </md-card>
+    <md-card ng-if="!agregar&&!editar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Subir archivo de capacitaciones</span>
+            </md-card-title-text>
+        </md-card-title>
+        <input type="file" name="excel" accept="application/vnd.ms-excel" onchange="angular.element(this).scope().uploadFile(this.files)"/>
+        <div layout="row">
+            <md-button class="md-raised md-primary" ng-click="agregarCapacitaciones()">Enviar</md-button>
+            <span flex></span>
+        </div>
+    </md-card>
+    <div layout="row" layout-padding ng-if="!agregar">
+        <md-button class="md-primary" ng-click="irAgregar()">Nueva capacitación</md-button>
+    </div>
+    <md-card ng-if="agregar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Nueva capacitación</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <form name="capacitacionForm" novalidate ng-submit="capacitacionForm.$valid&&agregarCapacitacion()">
+                <div layout="column">
+                    <md-input-container>
+                        <label>Descripcion</label>
+                        <input md-maxlength="300" required name="descripcion" ng-model="capacitacion.descripcion">
+                        <div ng-messages="capacitacionForm.descripcion.$error" role="alert">
+                            <div ng-message="required">La capacitación debe tener una descripción o nombre</div>
+                            <div ng-message="md-maxlength">La descripción no puede exceder 300 caracteres</div>
+                        </div>
+                    </md-input-container>
+                    <div layout="row">
+                        <md-input-container>
+                            <md-datepicker name="fechaInicio" required ng-model="capacitacion.fechaInicio" md-placeholder="Fecha inicial"></md-datepicker>
+                            <div ng-messages="capacitacionForm.fechaInicio.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe elegirse una fecha de inicio</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container>
+                            <md-datepicker name="fechaFinal" required ng-model="capacitacion.fechaFinal" md-min-date="capacitacion.fechaInicio" md-placeholder="Fecha final"></md-datepicker>
+                            <div ng-messages="capacitacionForm.fechaFinal.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe elegirse una fecha de finalizacion</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <md-input-container>
+                        <label>Área</label>
+                        <input required name="area" ng-model="capacitacion.area">
+                        <div ng-messages="capacitacionForm.area.$error">
+                            <div ng-message="required">La capacitación debe tener una área</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Lugar</label>
+                        <input md-maxlength="300" required name="lugar" ng-model="capacitacion.lugar">
+                        <div ng-messages="capacitacionForm.lugar.$error">
+                            <div ng-message="required">Debe indicarse el lugar de la capacitación</div>
+                            <div ng-message="md-maxlength">El lugar no puede exceder 300 caracteres</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Facilitador</label>
+                        <input md-maxlength="140" required name="facilitador" ng-model="capacitacion.facilitador">
+                        <div ng-messages="capacitacionForm.facilitador.$error">
+                            <div ng-message="required">Debe indicarse el facilitador de la capacitación</div>
+                            <div ng-message="md-maxlength">El facilitador no puede exceder 140 caracteres</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Costo</label>
+                        <input type="number" name="costo" ng-model="capacitacion.costo" ng-pattern="/^[0-9]+[\.0-9]*$/">
+                        <div ng-messages="capacitacionForm.costo.$error">
+                            <div ng-message="pattern">Deben incluirse únicamente números positivos</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Observaciones</label>
+                        <textarea md-maxlength="500" name="observaciones" ng-model="capacitacion.observaciones" rows="4"/>
+                        <div ng-messages="capacitacionForm.observaciones.$error">
+                            <div ng-message="md-maxlength">La observación no puede exceder 500 caracteres</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div class="row">
+                    <md-button class="md-raised md-primary" flex="20" type="submit" ng-disabled="capacitacionForm.$invalid">Guardar</md-button>
+                    <md-button class="md-raised md-primary" flex="20" ng-click="salirAgregar()">Cancelar</md-button>
+                    <span flex></span>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+    <md-card ng-if="editar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Editar capacitación</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <form name="capacitacionForm" novalidate ng-submit="capacitacionForm.$valid&&editarCapacitacion()">
+                <div layout="column">
+                    <md-input-container>
+                        <label>Descripcion</label>
+                        <input md-maxlength="300" required name="descripcion" ng-model="capacitacion.descripcion">
+                        <div ng-messages="capacitacionForm.descripcion.$error">
+                            <div ng-message="required">La capacitación debe tener una descripción o nombre</div>
+                            <div ng-message="md-maxlength">La descripción no puede exceder 300 caracteres</div>
+                        </div>
+                    </md-input-container>
+                    <div layout="row">
+                        <md-input-container>
+                            <md-datepicker name="fechaInicio" required ng-model="capacitacion.fechaInicio" md-placeholder="Fecha inicial"></md-datepicker>
+                            <div ng-messages="capacitacionForm.fechaInicio.$error" role="alert" multiple>
+                                <div ng-message="required" class="my-message">Debe elegirse una fecha de inicio</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container>
+                            <md-datepicker name="fechaFinal" required ng-model="capacitacion.fechaFinal" md-min-date="capacitacion.fechaInicio" md-placeholder="Fecha final"></md-datepicker>
+                            <div ng-messages="capacitacionForm.fechaFinal.$error" role="alert" multiple>
+                                <div ng-message="required" class="my-message">Debe elegirse una fecha de finalizacion</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <md-input-container>
+                        <label>Área</label>
+                        <input required name="area" ng-model="capacitacion.area">
+                        <div ng-messages="capacitacionForm.area.$error">
+                            <div ng-message="required">La capacitación debe tener una área</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Lugar</label>
+                        <input md-maxlength="300" required name="lugar" ng-model="capacitacion.lugar">
+                        <div ng-messages="capacitacionForm.lugar.$error">
+                            <div ng-message="required">Debe indicarse el lugar de la capacitación</div>
+                            <div ng-message="md-maxlength">El lugar no puede exceder 300 caracteres</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Facilitador</label>
+                        <input md-maxlength="140" required name="facilitador" ng-model="capacitacion.facilitador">
+                        <div ng-messages="capacitacionForm.facilitador.$error">
+                            <div ng-message="required">Debe indicarse el facilitador de la capacitación</div>
+                            <div ng-message="md-maxlength">El facilitador no puede exceder 140 caracteres</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Costo</label>
+                        <input type="number" name="costo" ng-model="capacitacion.costo" ng-pattern="/^[0-9]+[\.0-9]*$/">
+                        <div ng-messages="capacitacionForm.costo.$error">
+                            <div ng-message="pattern">Deben incluirse únicamente números positivos</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Observaciones</label>
+                        <textarea md-maxlength="500" name="observaciones" ng-model="capacitacion.observaciones" rows="4"/>
+                        <div ng-messages="capacitacionForm.observaciones.$error">
+                            <div ng-message="md-maxlength">La observación no puede exceder 500 caracteres</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div class="row">
+                    <md-button class="md-raised md-primary" flex="20" type="submit" ng-disabled="capacitacionForm.$invalid">Guardar</md-button>
+                    <md-button class="md-raised md-primary" flex="20" ng-click="salirEditar()">Cancelar</md-button>
+                    <span flex></span>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+</div>

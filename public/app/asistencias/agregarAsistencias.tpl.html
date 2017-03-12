@@ -1,0 +1,79 @@
+<md-dialog aria-label="Agregar asistencias" flex>
+    <form name="asistenciaForm" novalidate ng-submit="asistenciaForm.$valid&&agregarAsistencias()">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Registrar asistencias</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cerrar()">
+                    <md-icon md-svg-src="public/images/cerrar.svg" aria-label="Cerrar"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content" layout="column">
+                <md-input-container class="md-block">
+                    <label>Horas</label>
+                    <input name="horas" ng-model="asistencia.horas" ng-pattern="/^[0-9]+[\.0-9]*$/" required/>
+                    <div ng-messages="asistenciaForm.horas.$error">
+                        <div ng-message="pattern">Las horas deben ser únicamente números</div>
+                        <div ng-message="required">Debe indicarse el número de horas que tomó la asistencia</div>
+                    </div>
+                </md-input-container>
+                <md-input-container class="md-icon-float md-block">
+                    <label>Buscar</label>
+                    <md-icon md-svg-src="public/images/buscar.svg" class="name"></md-icon>
+                    <input ng-model="busqueda" type="text">
+                </md-input-container>
+                <div class="hint">Debe indicarse el número de horas y seleccionarse al menos un empleado</div>
+                <div layout="row">
+                    <div flex="50">
+                        <md-toolbar layout="row" class="md-hue-3">
+                            <div class="md-toolbar-tools">
+                                <span>Empleados</span>
+                            </div>
+                        </md-toolbar>
+                        <md-content>
+                            <md-list class="md-dense">
+                                <md-list-item class="md-2-line" ng-repeat="empleado in empleados | filter:busqueda" ng-click="seleccionarEmpleado(empleado)">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ empleado.nombre }}</h3>
+                                        <h4>C.C. {{ empleado.cedula }}</h4>
+                                    </div>
+                                    <md-icon ng-if="empleado.seleccionado" class="md-secondary" md-svg-src="public/images/seleccionado.svg"></md-icon>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
+                    </div>
+                    <div flex>
+                        <md-toolbar layout="row" class="md-hue-3">
+                            <div class="md-toolbar-tools">
+                                <span>Empleados seleccionados</span>
+                            </div>
+                        </md-toolbar>
+                        <md-content>
+                            <md-list class="md-dense">
+                                <md-list-item class="md-2-line" ng-repeat="empleado in empleadosSeleccionados">
+                                    <div class="md-list-item-text" layout="column">
+                                        <h3>{{ empleado.nombre }}</h3>
+                                        <h4>C.C. {{ empleado.cedula }}</h4>
+                                    </div>
+                                    <md-divider></md-divider>
+                                </md-list-item>
+                            </md-list>
+                        </md-content>
+                    </div>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <span flex></span>
+            <md-button class="md-raised md-primary" ng-click="cerrar()">
+                Cancelar
+            </md-button>
+            <md-button class="md-raised md-primary" type="submit" ng-disabled="asistenciaForm.$invalid||empleadosSeleccionados.length==0">
+                Guardar
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

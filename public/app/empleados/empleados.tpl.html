@@ -1,0 +1,216 @@
+<div layout="column">
+    <md-card ng-if="!agregar&&!editar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Buscar empleados</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <form name="buscarForm" novalidate ng-submit="buscarForm.$valid&&buscarEmpleados()">
+                <div layout="row">
+                    <md-input-container flex="70">
+                        <label>Buscar</label>
+                        <input type="text" name="valor" required ng-model="busqueda.valor">
+                        <div ng-messages="buscarForm.valor.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe escribirse algo a buscar</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container flex="30">
+                        <label>por</label>
+                        <md-select ng-model="busqueda.atributo" name="atributo" required>
+                            <md-option ng-repeat="opcion in opciones" value="{{opcion}}">
+                                {{opcion}}
+                            </md-option>
+                        </md-select>
+                        <div ng-messages="buscarForm.atributo.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe seleccionarse si buscar por cédula o nombre</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div layout="row">
+                    <md-checkbox ng-model="busqueda.activo" aria-label="Activos">
+                        Buscar solo empleados activos
+                    </md-checkbox>
+                </div>
+                <div layout="row">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="buscarForm.$invalid">Buscar</md-button>
+                    <md-button class="md-raised md-primary" ng-click="mostrarSinAsistencias()">Sin capacitaciones</md-button>
+                    <md-button class="md-raised md-primary" ng-click="mostrarSinAsistenciasFecha()">Sin capacitaciones entre fechas</md-button>
+                    <md-button class="md-raised md-primary" ng-click="mostrarTodos()">Mostrar todos</md-button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+    <div layout="row">
+        <md-card ng-if="!agregar&&!editar" flex>
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">Empleados</span>
+                    <span class="md-subhead" ng-if="filtro">{{filtro}}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <h4 ng-if="empleados.length==0">No se han encontrado registros</h4>
+                <md-list>
+                    <md-list-item class="md-3-line secondary-button-padding" ng-repeat="empleado in empleados">
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{ empleado.nombre }}</h3>
+                            <h4>C.C. {{ empleado.cedula }}</h4>
+                            <p ng-if="empleado.activo">Activo</p>
+                            <p ng-if="!empleado.activo">Inactivo</p>
+                        </div>
+                        <md-button class="md-secondary" ng-click="verAsistencias($index)">Ver asistencias</md-button>
+                        <md-button ng-click="irEditar($index)" class="md-secondary md-icon-button" aria-label="Editar">
+                            <md-icon md-svg-src="public/images/editar.svg"></md-icon>
+                        </md-button>
+                        <md-button ng-click="eliminarEmpleado($event,$index)" class="md-secondary md-icon-button" aria-label="Eliminar">
+                            <md-icon md-svg-src="public/images/eliminar.svg"></md-icon>
+                        </md-button>
+                    </md-list-item>
+                </md-list>
+            </md-card-content>
+        </md-card>
+        <md-card flex="50" ng-if="mostrarAsistencias&&!agregar&&!editar">
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">Asistencias</span>
+                    <span class="md-subheader">{{ nombreEmpleado }}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <form name="buscarForm" novalidate ng-submit="buscarForm.$valid&&filtrarAsistencias()">
+                    <div layout="row">
+                        <md-input-container flex="70" ng-if="busquedaAsistencia.atributo!==opcionesAsistencias[1]">
+                            <label>Buscar</label>
+                            <input type="text" name="valor" required ng-model="busquedaAsistencia.valor">
+                            <div ng-messages="buscarForm.valor.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe escribirse algo a buscar</div>
+                            </div>
+                        </md-input-container>
+                        <div flex="70" layout="row" ng-if="busquedaAsistencia.atributo===opcionesAsistencias[1]">
+                            <md-input-container>
+                                <md-datepicker name="fechaInicio" required ng-model="busquedaFecha.fechaInicio" md-placeholder="Fecha inicial"></md-datepicker>
+                                <div ng-messages="buscarForm.fechaInicio.$error" role="alert">
+                                    <div ng-message="required" class="my-message">Debe elegirse una fecha de inicio</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container>
+                                <md-datepicker name="fechaFinal" required ng-model="busquedaFecha.fechaFinal" md-min-date="busquedaFecha.fechaInicio" md-placeholder="Fecha final"></md-datepicker>
+                                <div ng-messages="buscarForm.fechaFinal.$error" role="alert">
+                                    <div ng-message="required" class="my-message">Debe elegirse una fecha de finalizacion</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <md-input-container flex="30">
+                            <label>por</label>
+                            <md-select ng-model="busquedaAsistencia.atributo" name="atributo" required>
+                                <md-option ng-repeat="opcion in opcionesAsistencias" value="{{opcion}}">
+                                    {{opcion}}
+                                </md-option>
+                            </md-select>
+                            <div ng-messages="buscarForm.atributo.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe seleccionarse el campo a partir del cual buscar</div>
+                            </div>
+                        </md-input-container>
+                    </div>
+                    <div layout="row">
+                        <md-button class="md-raised md-primary" type="submit" ng-disabled="buscarForm.$invalid">Buscar</md-button>
+                        <md-button class="md-raised md-primary" ng-click="mostrarTodasAsistencias()">Mostrar todas</md-button>
+                    </div>
+                </form>
+                <h4 ng-if="asistencias.length==0">No se han encontrado asistencias</h4>
+                <md-list>
+                    <md-list-item class="md-3-line secondary-button-padding" ng-repeat="asistencia in asistencias">
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{ asistencia.capacitacion.descripcion }} ({{ millisToFecha(asistencia.capacitacion.fechaInicio) }}-{{ millisToFecha(asistencia.capacitacion.fechaFinal) }})</h3>
+                            <h4>{{ asistencia.capacitacion.area }}</h4>
+                            <p>{{ asistencia.horas }} horas</p>
+                        </div>
+                        <md-button ng-click="mostrarDetalles($index)" class="md-secondary md-icon-button" aria-label="Detalles">
+                            <md-icon md-svg-src="public/images/detalles.svg"></md-icon>
+                        </md-button>
+                    </md-list-item>
+                </md-list>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button ng-click="ocultarAsistencias()">Ocultar</md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
+    <div layout="row" ng-if="!agregar&&!editar">
+        <md-button class="md-primary" ng-click="irAgregar()">Nuevo empleado</md-button>
+    </div>
+    <md-card ng-if="agregar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Nuevo empleado</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <form name="empleadoForm" novalidate ng-submit="empleadoForm.$valid&&guardarEmpleado()">
+                <div layout="column">
+                    <md-input-container class="md-block">
+                        <label>Nombre</label>
+                        <input ng-model="empleado.nombre" name="nombre" required ng-pattern="/^[a-zA-Z\s]*$/" md-maxlength="140">
+                        <div ng-messages="empleadoForm.nombre.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe escribirse un nombre</div>
+                            <div ng-message="pattern" class="my-message">El nombre no es válido</div>
+                            <div ng-message="md-maxlength" class="my-message">El nombre tiene más caracteres de los permitidos</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Cedula</label>
+                        <input ng-model="empleado.cedula" name="cedula" required ng-pattern="/^[0-9]+$/">
+                        <div ng-messages="empleadoForm.cedula.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe escribirse una cedula</div>
+                            <div ng-message="pattern" class="my-message">La cedula debe contener únicamente numeros</div>
+                        </div>
+                    </md-input-container>
+                </div>
+                <div class="row">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="empleadoForm.$invalid">Guardar</md-button>
+                    <md-button class="md-raised md-primary" ng-click="salirAgregar()">Cancelar</md-button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+    <md-card ng-if="editar">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">Editar empleado</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <form name="empleadoForm" novalidate ng-submit="empleadoForm.$valid&&editarEmpleado()">
+                <div layout="column">
+                    <md-input-container class="md-block">
+                        <label>Nombre</label>
+                        <input ng-model="empleado.nombre" name="nombre" required ng-pattern="/^[a-zA-Z\s]*$/" md-maxlength="140">
+                        <div ng-messages="empleadoForm.nombre.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe escribirse un nombre</div>
+                            <div ng-message="pattern" class="my-message">El nombre no es válido</div>
+                            <div ng-message="md-maxlength" class="my-message">El nombre tiene más caracteres de los permitidos</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                        <label>Cedula</label>
+                        <input ng-model="empleado.cedula" name="cedula" required ng-pattern="/^[0-9]+$/">
+                        <div ng-messages="empleadoForm.cedula.$error" role="alert">
+                            <div ng-message="required" class="my-message">Debe escribirse una cedula</div>
+                            <div ng-message="pattern" class="my-message">La cedula debe contener únicamente numeros</div>
+                        </div>
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                        <md-checkbox ng-model="empleado.activo" name="activo">
+                            Activo
+                        </md-checkbox>
+                    </md-input-container>
+                </div>
+                <div class="row">
+                    <md-button class="md-raised md-primary" type="submit" ng-disabled="empleadoForm.$invalid">Guardar</md-button>
+                    <md-button class="md-raised md-primary" ng-click="salirEditar()">Cancelar</md-button>
+                </div>
+            </form>
+        </md-card-content>
+    </md-card>
+</div>

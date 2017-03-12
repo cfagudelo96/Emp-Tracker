@@ -1,0 +1,33 @@
+<md-dialog aria-label="Fechas">
+    <form name="buscarForm" novalidate ng-submit="buscarForm.$valid&&answer()">
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Buscar por fechas</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-src="public/images/cerrar.svg" aria-label="Cerrar"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content style="width: 100%;" layout="row" layout-align="space-around center">
+            <div class="md-dialog-content">
+                <md-input-container>
+                    <md-datepicker name="fechaInicio" required ng-model="busquedaFecha.fechaInicio" md-placeholder="Fecha inicial"></md-datepicker>
+                    <div ng-messages="buscarForm.fechaInicio.$error" role="alert">
+                        <div ng-message="required" class="my-message">Debe elegirse una fecha de inicio</div>
+                    </div>
+                </md-input-container>
+                <md-input-container>
+                    <md-datepicker name="fechaFinal" required ng-model="busquedaFecha.fechaFinal" md-min-date="busquedaFecha.fechaInicio" md-placeholder="Fecha final"></md-datepicker>
+                    <div ng-messages="buscarForm.fechaFinal.$error" role="alert">
+                        <div ng-message="required" class="my-message">Debe elegirse una fecha de finalizacion</div>
+                    </div>
+                </md-input-container>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button class="md-raised md-primary" type="submit" ng-disabled="buscarForm.$invalid">Buscar</md-button>
+            <md-button class="md-raised md-primary" ng-click="cancel()">Cancelar</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>
