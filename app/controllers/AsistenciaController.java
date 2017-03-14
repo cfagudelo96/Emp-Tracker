@@ -44,12 +44,12 @@ public class AsistenciaController extends Controller {
     }
 
     public Result darAsistencias() {
-        List<Asistencia> asistencias = Asistencia.find.all();
+        List<Asistencia> asistencias = Ebean.find(Asistencia.class).fetch("empleado").fetch("capacitacion").findList();
         return ok(Json.toJson(asistencias));
     }
 
     public Result obtenerAsistenciasEmpleado(Long id) {
-        List<Asistencia> asistencias = Asistencia.find.where().eq("empleado.id",id).findList();
+        List<Asistencia> asistencias = Asistencia.find.fetch("empleado").fetch("capacitacion").where().eq("empleado.id",id).findList();
         return ok(Json.toJson(asistencias));
     }
 
@@ -61,7 +61,7 @@ public class AsistenciaController extends Controller {
             DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             Date fechaInicio = format.parse(fechaInicioString);
             Date fechaFinal = format.parse(fechaFinalString);
-            List<Asistencia> asistencias = Asistencia.find.where().and(Expr.eq("empleado.id",id),Expr.and(Expr.between("capacitacion.fechaInicio",fechaInicio,fechaFinal),Expr.between("capacitacion.fechaFinal",fechaInicio,fechaFinal))).findList();
+            List<Asistencia> asistencias = Asistencia.find.fetch("empleado").fetch("capacitacion").where().and(Expr.eq("empleado.id",id),Expr.and(Expr.between("capacitacion.fechaInicio",fechaInicio,fechaFinal),Expr.between("capacitacion.fechaFinal",fechaInicio,fechaFinal))).findList();
             return ok(Json.toJson(asistencias));
         } catch (Exception e) {
             ObjectNode error = Json.newObject();
@@ -75,7 +75,7 @@ public class AsistenciaController extends Controller {
         String atributo = jsonNode.findPath("atributo").asText();
         atributo = atributo.toLowerCase();
         String valor = jsonNode.findPath("valor").asText();
-        List<Asistencia> asistencias = Asistencia.find.where().and(Expr.ilike("capacitacion."+atributo,"%"+valor+"%"),Expr.eq("empleado.id",id)).findList();
+        List<Asistencia> asistencias = Asistencia.find.fetch("empleado").fetch("capacitacion").where().and(Expr.ilike("capacitacion."+atributo,"%"+valor+"%"),Expr.eq("empleado.id",id)).findList();
         return ok(Json.toJson(asistencias));
     }
 
@@ -84,12 +84,12 @@ public class AsistenciaController extends Controller {
         String atributo = jsonNode.findPath("atributo").asText();
         atributo = atributo.toLowerCase();
         String valor = jsonNode.findPath("valor").asText();
-        List<Asistencia> asistencias = Asistencia.find.where().and(Expr.ilike("empleado." + atributo, "%" + valor + "%"), Expr.eq("capacitacion.id", id)).findList();
+        List<Asistencia> asistencias = Asistencia.find.fetch("empleado").fetch("capacitacion").where().and(Expr.ilike("empleado." + atributo, "%" + valor + "%"), Expr.eq("capacitacion.id", id)).findList();
         return ok(Json.toJson(asistencias));
     }
 
     public Result obtenerAsistenciasCapacitacion(Long id) {
-        List<Asistencia> asistencias = Asistencia.find.where().eq("capacitacion.id",id).findList();
+        List<Asistencia> asistencias = Asistencia.find.fetch("empleado").fetch("capacitacion").where().eq("capacitacion.id",id).findList();
         return ok(Json.toJson(asistencias));
     }
 }
