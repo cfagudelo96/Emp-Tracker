@@ -212,7 +212,7 @@
 
        $scope.verAsistencias = function (index) {
            $http.get('/api/capacitaciones/'+$scope.capacitaciones[index].id+'/asistencias').then(function (response) {
-               $scope.nombreCapacitacion = $scope.capacitaciones[index].nombre
+               $scope.descripcionCapacitacion = $scope.capacitaciones[index].descripcion
                $scope.idCapacitacion = $scope.capacitaciones[index].id
                $scope.mostrarAsistencias = true;
                $scope.asistencias = response.data;

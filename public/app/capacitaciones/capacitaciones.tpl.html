@@ -89,18 +89,18 @@
                 <md-card-title>
                     <md-card-title-text>
                         <span class="md-headline">Asistencias</span>
-                        <span class="md-subheader">{{ nombreCapacitacion }}</span>
+                        <span class="md-subhead">{{ descripcionCapacitacion }}</span>
                     </md-card-title-text>
                 </md-card-title>
                 <md-card-content>
                     <form name="buscarForm" novalidate ng-submit="buscarForm.$valid&&filtrarAsistencias()">
                         <div layout="row">
-                            <md-input-container flex="70"
-                            <label>Buscar</label>
-                            <input type="text" name="valor" required ng-model="busquedaAsistencia.valor">
-                            <div ng-messages="buscarForm.valor.$error" role="alert">
-                                <div ng-message="required" class="my-message">Debe escribirse algo a buscar</div>
-                            </div>
+                            <md-input-container flex="70">
+                                <label>Buscar</label>
+                                <input type="text" name="valor" required ng-model="busquedaAsistencia.valor">
+                                <div ng-messages="buscarForm.valor.$error" role="alert">
+                                    <div ng-message="required" class="my-message">Debe escribirse algo a buscar</div>
+                                </div>
                             </md-input-container>
                             <md-input-container flex="30">
                                 <label>por</label>
