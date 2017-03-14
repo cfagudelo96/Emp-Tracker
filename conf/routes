@@ -26,8 +26,9 @@ DELETE  /api/capacitaciones/:id                 controllers.CapacitacionControll
 
 GET     /api/asistencias                        controllers.AsistenciaController.darAsistencias
 GET     /api/empleados/:id/asistencias          controllers.AsistenciaController.obtenerAsistenciasEmpleado(id:Long)
-GET     /api/capacitaciones/:id/asistencias     controllers.AsistenciaController.obtenerAsistenciasEmpleadoCapacitacion(id:Long)
+GET     /api/capacitaciones/:id/asistencias     controllers.AsistenciaController.obtenerAsistenciasCapacitacion(id:Long)
 POST    /api/empleados/:id/asistencias          controllers.AsistenciaController.obtenerAsistenciasEmpleadoCapacitacion(id:Long)
+POST    /api/capacitaciones/:id/asistencias     controllers.AsistenciaController.obtenerAsistenciasCapacitacionEmpleado(id:Long)
 POST    /api/empleados/:id/asistencias/fechas   controllers.AsistenciaController.obtenerAsistenciasEmpleadoFechas(id:Long)
 POST    /api/asistencias                        controllers.AsistenciaController.agregarAsistencias
 

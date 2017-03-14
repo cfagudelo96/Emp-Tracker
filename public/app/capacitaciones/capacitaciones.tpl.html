@@ -48,38 +48,91 @@
             </form>
         </md-card-content>
     </md-card>
-    <md-card ng-if="!agregar&&!editar">
-        <md-card-title>
-            <md-card-title-text>
-                <span class="md-headline">Capacitaciones</span>
-                <span class="md-subhead" ng-if="filtro">{{filtro}}</span>
-            </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-            <h4 ng-if="capacitaciones.length==0">No se han encontrado registros</h4>
-            <md-list>
-                <md-list-item class="md-3-line secondary-button-padding" ng-repeat="capacitacion in capacitaciones">
-                    <div class="md-list-item-text" layout="column">
-                        <h3>{{ capacitacion.descripcion }}</h3>
-                        <h4>{{ millisToFecha(capacitacion.fechaInicio) }} - {{ millisToFecha(capacitacion.fechaFinal) }}</h4>
-                        <p>{{ capacitacion.area }}</p>
+    <div layout="row">
+        <md-card ng-if="!agregar&&!editar" flex>
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">Capacitaciones</span>
+                    <span class="md-subhead" ng-if="filtro">{{filtro}}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <h4 ng-if="capacitaciones.length==0">No se han encontrado registros</h4>
+                <md-list>
+                    <md-list-item class="md-3-line secondary-button-padding" ng-repeat="capacitacion in capacitaciones">
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{ capacitacion.descripcion }}</h3>
+                            <h4>{{ millisToFecha(capacitacion.fechaInicio) }} - {{ millisToFecha(capacitacion.fechaFinal) }}</h4>
+                            <p>{{ capacitacion.area }}</p>
+                        </div>
+                        <md-button class="md-secondary" ng-click="verAsistencias($index)">Ver asistencias</md-button>
+                        <md-button ng-click="mostrarDetalles($index)" class="md-secondary md-icon-button" aria-label="Detalles">
+                            <md-icon md-svg-src="public/images/detalles.svg"></md-icon>
+                        </md-button>
+                        <md-button ng-click="agregarAsistencias($event, $index)" class="md-secondary md-icon-button" aria-label="Agregar">
+                            <md-icon md-svg-src="public/images/agregar.svg"></md-icon>
+                        </md-button>
+                        <md-button ng-click="irEditar($index)" class="md-secondary md-icon-button" aria-label="Editar">
+                            <md-icon md-svg-src="public/images/editar.svg"></md-icon>
+                        </md-button>
+                        <md-button ng-click="eliminarCapacitacion($event, $index)" class="md-secondary md-icon-button" aria-label="Eliminar">
+                            <md-icon md-svg-src="public/images/eliminar.svg"></md-icon>
+                        </md-button>
+                    </md-list-item>
+                </md-list>
+            </md-card-content>
+        </md-card>
+        <md-card flex="50" ng-if="mostrarAsistencias&&!agregar&&!editar">
+            <md-card-title>
+                <md-card-title-text>
+                    <span class="md-headline">Asistencias</span>
+                    <span class="md-subheader">{{ nombreCapacitacion }}</span>
+                </md-card-title-text>
+            </md-card-title>
+            <md-card-content>
+                <form name="buscarForm" novalidate ng-submit="buscarForm.$valid&&filtrarAsistencias()">
+                    <div layout="row">
+                        <md-input-container flex="70"
+                            <label>Buscar</label>
+                            <input type="text" name="valor" required ng-model="busquedaAsistencia.valor">
+                            <div ng-messages="buscarForm.valor.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe escribirse algo a buscar</div>
+                            </div>
+                        </md-input-container>
+                        <md-input-container flex="30">
+                            <label>por</label>
+                            <md-select ng-model="busquedaAsistencia.atributo" name="atributo" required>
+                                <md-option ng-repeat="opcion in opcionesAsistencias" value="{{opcion}}">
+                                    {{opcion}}
+                                </md-option>
+                            </md-select>
+                            <div ng-messages="buscarForm.atributo.$error" role="alert">
+                                <div ng-message="required" class="my-message">Debe seleccionarse el campo a partir del cual buscar</div>
+                            </div>
+                        </md-input-container>
                     </div>
-                    <md-button ng-click="mostrarDetalles($index)" class="md-secondary md-icon-button" aria-label="Detalles">
-                        <md-icon md-svg-src="public/images/detalles.svg"></md-icon>
-                    </md-button>
-                    <md-button ng-click="agregarAsistencias($event, $index)" class="md-secondary md-icon-button" aria-label="Agregar">
-                        <md-icon md-svg-src="public/images/agregar.svg"></md-icon>
-                    </md-button>
-                    <md-button ng-click="irEditar($index)" class="md-secondary md-icon-button" aria-label="Editar">
-                        <md-icon md-svg-src="public/images/editar.svg"></md-icon>
-                    </md-button>
-                    <md-button ng-click="eliminarCapacitacion($event, $index)" class="md-secondary md-icon-button" aria-label="Eliminar">
-                        <md-icon md-svg-src="public/images/eliminar.svg"></md-icon>
-                    </md-button>
-                </md-list-item>
-            </md-list>
-        </md-card-content>
-    </md-card>
+                    <div layout="row">
+                        <md-button class="md-raised md-primary" type="submit" ng-disabled="buscarForm.$invalid">Buscar</md-button>
+                        <md-button class="md-raised md-primary" ng-click="mostrarTodasAsistencias()">Mostrar todas</md-button>
+                    </div>
+                </form>
+                <h4 ng-if="asistencias.length==0">No se han encontrado asistencias</h4>
+                <md-list>
+                    <md-list-item class="md-3-line secondary-button-padding" ng-repeat="asistencia in asistencias">
+                        <div class="md-list-item-text" layout="column">
+                            <h3>{{ asistencia.empleado.nombre }}</h3>
+                            <h4>C.C. {{ asistencia.empleado.cedula }}</h4>
+                            <p ng-if="asistencia.empleado.activo">Activo</p>
+                            <p ng-if="!asistencia.empleado.activo">Inactivo</p>
+                        </div>
+                    </md-list-item>
+                </md-list>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center">
+                <md-button ng-click="ocultarAsistencias()">Ocultar</md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
     <md-card ng-if="!agregar&&!editar">
         <md-card-title>
             <md-card-title-text>

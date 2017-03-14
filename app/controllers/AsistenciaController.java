@@ -79,6 +79,15 @@ public class AsistenciaController extends Controller {
         return ok(Json.toJson(asistencias));
     }
 
+    public Result obtenerAsistenciasCapacitacionEmpleado(Long id) {
+        JsonNode jsonNode = request().body().asJson();
+        String atributo = jsonNode.findPath("atributo").asText();
+        atributo = atributo.toLowerCase();
+        String valor = jsonNode.findPath("valor").asText();
+        List<Asistencia> asistencias = Asistencia.find.where().and(Expr.ilike("empleado." + atributo, "%" + valor + "%"), Expr.eq("capacitacion.id", id)).findList();
+        return ok(Json.toJson(asistencias));
+    }
+
     public Result obtenerAsistenciasCapacitacion(Long id) {
         List<Asistencia> asistencias = Asistencia.find.where().eq("capacitacion.id",id).findList();
         return ok(Json.toJson(asistencias));

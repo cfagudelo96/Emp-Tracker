@@ -3,6 +3,10 @@
 
        $scope.opciones = ['Descripcion','Fechas','Facilitador','Area','Lugar'];
 
+       $scope.opcionesAsistencias = ['Nombre','Cedula'];
+
+       $scope.busquedaAsistencia = {};
+
        $scope.busqueda = {};
 
        $scope.busquedaFecha = {};
@@ -203,6 +207,38 @@
                clickOutsideToClose:true
            }).then(function (respuesta) {
                $scope.showToast(respuesta);
+           });
+       };
+
+       $scope.verAsistencias = function (index) {
+           $http.get('/api/capacitaciones/'+$scope.capacitaciones[index].id+'/asistencias').then(function (response) {
+               $scope.nombreCapacitacion = $scope.capacitaciones[index].nombre
+               $scope.idCapacitacion = $scope.capacitaciones[index].id
+               $scope.mostrarAsistencias = true;
+               $scope.asistencias = response.data;
+           }).catch(function () {
+               $scope.showAlert('No se pudo obtener las asistencias a la capacitación');
+           });
+       };
+
+       $scope.ocultarAsistencias = function () {
+           $scope.mostrarAsistencias = false;
+           $scope.busquedaAsistencia = {};
+       };
+
+       $scope.filtrarAsistencias = function () {
+           $http.post('/api/capacitaciones/'+$scope.idCapacitacion+'/asistencias',$scope.busquedaAsistencia).then(function (response) {
+               $scope.asistencias = response.data;
+           }).catch(function () {
+               $scope.showAlert('No se pudo filtrar las asistencias de la capacitación');
+           });
+       };
+
+       $scope.mostrarTodasAsistencias = function () {
+           $http.get('/api/capacitaciones/'+$scope.idCapacitacion+'/asistencias').then(function (response) {
+               $scope.asistencias = response.data;
+           }).catch(function () {
+               $scope.showAlert('No se pudo obtener las asistencias de la capacitación');
            });
        };
    });
